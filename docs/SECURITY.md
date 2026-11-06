@@ -64,7 +64,8 @@ protection beyond the hosting platform, and compromise of the hosting accounts t
 ## Audio access
 
 - The R2 bucket is **private**. No public bucket URL or custom domain is needed or recommended.
-- Uploads use presigned PUT URLs (15 minutes by default) for a server-chosen key, with `Content-Type` signed.
+- Uploads use presigned PUT URLs (15 minutes by default) for a server-chosen key, with `Content-Type` and
+  `Content-Length` signed.
 - In the default **proxy** mode, the application authorizes every byte-range request and streams the object.
   Revocation is immediate.
 - In **redirect** mode, each authorized request receives a fresh presigned GET URL valid for one hour.

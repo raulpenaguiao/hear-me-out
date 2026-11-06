@@ -117,7 +117,7 @@ Upload flow:
 
 1. `POST /api/publisher/uploads` — validates declared MIME type + extension (they must agree), size limits and
    ownership (via RLS), rate limits, records a pending `uploads` row, returns a presigned PUT URL
-   (15 min, signed `Content-Type`).
+   (15 min; `Content-Type` and `Content-Length` are signed, so R2 rejects a PUT of a different type or size).
 2. Browser `PUT`s the file straight to R2 with progress reporting (XHR).
 3. `POST /api/publisher/uploads/:id/complete` — `HEAD`s the object, requires the stored size to equal the
    declared size and be within limits, reads the first 4 KiB and **sniffs the container format** (MP3/ID3,

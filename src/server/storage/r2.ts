@@ -83,7 +83,9 @@ export class R2Storage implements ObjectStorage {
     });
     const url = await getSignedUrl(this.client, command, {
       expiresIn: input.expiresInSeconds,
-      signableHeaders: new Set(["content-type"]),
+      // Content-Type and Content-Length are signed: R2 rejects a PUT whose
+      // type or byte size differs from what the server validated.
+      signableHeaders: new Set(["content-type", "content-length"]),
     });
     return {
       url,

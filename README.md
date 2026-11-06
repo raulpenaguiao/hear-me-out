@@ -167,8 +167,9 @@ npm run test:e2e           # builds the app and runs Playwright against local Su
 - **Unit** (118 tests): token generation/hashing/encryption, XML escaping, RSS structure, audio format
   sniffing, range parsing, validation, and the public feed/audio/cover handlers (authorization, revoked
   tokens, drafts, IDOR, Range/HEAD/304/416, rate limiting) with in-memory doubles.
-- **Integration** (29 tests): real Supabase — auth, RLS isolation, column privileges, privileged functions,
+- **Integration** (29 tests + 6 opt-in): real Supabase — auth, RLS isolation, column privileges, privileged functions,
   channel/episode lifecycle, feeds, token rotation, audio authorization, upload verification, rate limiter.
+  The R2 adapter tests run when `S3_TEST_ENDPOINT` points at an S3-compatible server (MinIO, moto).
 - **E2E** (15 tests): registration, login/logout, channel creation, file upload, in-browser recording (fake
   microphone), publishing, drafts, anonymous listening with range requests, RSS, invalid tokens, token
   rotation, unpublishing, and mobile layout checks.
@@ -191,9 +192,10 @@ integration. Step-by-step instructions: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
 - **WebM/Opus recordings** (Chrome/Firefox/Android) play in browsers and many Android apps but **not in Apple
   Podcasts**. Safari/iOS records M4A (AAC), which is broadly compatible. There is no server-side transcoding.
 - **Durations** are measured in the browser (recorder timer or file metadata), not by the server.
-- **Upload size is verified after upload** (R2 does not support POST-policy size limits): oversized or
-  mismatching objects are deleted at the completion step. Abandoned uploads (never completed) may leave
-  orphaned objects; see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md#r2-lifecycle-optional).
+- **Uploads**: the presigned PUT signs the declared `Content-Type` and `Content-Length`, and the server
+  re-verifies size and content after upload (deleting mismatches). The R2 adapter was tested against an
+  S3-compatible emulator (moto), not against Cloudflare R2 itself. Abandoned uploads (never completed) may
+  leave orphaned objects; see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md#r2-lifecycle-optional).
 - **Streaming via Vercel Functions** is subject to function duration limits and bandwidth costs; for very large
   files or heavy traffic use `AUDIO_DELIVERY_MODE=redirect`.
 - **Rate limiting** is per IP/user in Postgres (fixed windows); it is a speed bump, not DDoS protection.
