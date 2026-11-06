@@ -64,7 +64,9 @@ export async function serveObject(request: Request, opts: ServeObjectOptions): P
     "Accept-Ranges": "bytes",
     ETag: opts.etag,
     "Last-Modified": opts.lastModified.toUTCString(),
-    "Cache-Control": opts.cacheControl,
+    // no-transform: byte-exact delivery. Prevents gzip (which would drop
+    // Content-Length and break ranges) by Next.js and intermediaries.
+    "Cache-Control": `${opts.cacheControl}, no-transform`,
     "Content-Disposition": `inline; filename="${opts.fileName.replace(/[^A-Za-z0-9._-]/g, "_")}"`,
     ...PRIVATE_RESPONSE_HEADERS,
   };
@@ -82,7 +84,7 @@ export async function serveObject(request: Request, opts: ServeObjectOptions): P
   if (parsed.type === "unsatisfiable") {
     return new Response(null, {
       status: 416,
-      headers: { ...baseHeaders, "Content-Range": `bytes */${opts.size}` },
+      headers: { ...baseHeaders, "Content-Range": `bytes */${opts.size}`, "Content-Length": "0" },
     });
   }
 

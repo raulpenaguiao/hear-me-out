@@ -1,8 +1,7 @@
-import "server-only";
 import { appUrl, getEnv } from "@/lib/env";
 import { clientIp, createRateLimiter, RATE_LIMITS } from "../rate-limit";
 import { getStorage } from "../storage";
-import { createAdminClient } from "../supabase/clients";
+import { createAdminClient } from "../supabase/admin";
 import { SupabasePublicRepository } from "./supabase-repository";
 import type { PublicContext } from "./types";
 

@@ -17,7 +17,7 @@ function isActive(pathname: string, href: string, exact?: boolean) {
 }
 
 export function DesktopNav() {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
   return (
     <nav aria-label="Principal" className="hidden items-center gap-1 sm:flex">
       {ITEMS.map((item) => {
@@ -46,7 +46,7 @@ export function DesktopNav() {
 }
 
 export function MobileNav() {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
   return (
     <nav
       aria-label="Principal"

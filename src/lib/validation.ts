@@ -64,7 +64,12 @@ export const completeUploadSchema = z.object({
     .transform((v) => (v === undefined || v === null ? null : Math.round(v))),
 });
 
-export const emailSchema = z.email("Indica um e-mail válido.").trim().toLowerCase().max(254);
+export const emailSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .max(254, "Indica um e-mail válido.")
+  .pipe(z.email("Indica um e-mail válido."));
 
 export const passwordSchema = z
   .string()

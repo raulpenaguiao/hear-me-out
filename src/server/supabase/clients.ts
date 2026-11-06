@@ -1,6 +1,6 @@
 import "server-only";
 import { createServerClient } from "@supabase/ssr";
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import type { Database } from "@/lib/database.types";
 import { getEnv } from "@/lib/env";
@@ -33,18 +33,4 @@ export async function createUserClient(): Promise<Db> {
   });
 }
 
-let admin: Db | undefined;
-
-/**
- * Service-role client. Bypasses RLS — use only in server code, only after
- * performing explicit authorization checks, and never return its results to
- * the client without filtering.
- */
-export function createAdminClient(): Db {
-  if (admin) return admin;
-  const env = getEnv();
-  admin = createClient<Database>(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
-    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-  });
-  return admin;
-}
+export { createAdminClient } from "./admin";

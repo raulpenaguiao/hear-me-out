@@ -1,4 +1,3 @@
-import "server-only";
 import { appUrl, getEnv } from "@/lib/env";
 import { LocalStorage } from "./local";
 import { R2Storage } from "./r2";
@@ -6,6 +5,7 @@ import type { ObjectStorage } from "./types";
 
 let instance: ObjectStorage | undefined;
 
+/** Server-side only (reads storage credentials). */
 export function getStorage(): ObjectStorage {
   if (instance) return instance;
   const env = getEnv();

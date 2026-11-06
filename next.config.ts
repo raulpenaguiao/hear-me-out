@@ -49,6 +49,13 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  async rewrites() {
+    return [
+      // Audio is served from a Pages Router API route so that Content-Length
+      // is preserved exactly (see src/server/node-bridge.ts).
+      { source: "/audio/:guid/:token", destination: "/api/public/audio/:guid/:token" },
+    ];
+  },
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },
