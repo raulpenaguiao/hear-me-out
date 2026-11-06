@@ -1,0 +1,129 @@
+name: CI / CD
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: "22"
+  # Telemetry off for reproducible CI logs.
+  NEXT_TELEMETRY_DISABLED: "1"
+
+jobs:
+  checks:
+    name: Lint, types, unit tests, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run typecheck
+      - run: npm run test:unit
+      # The build needs no secrets: configuration is read at request time.
+      - run: npm run build
+
+  integration:
+    name: Integration + E2E (local Supabase)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - name: Start local Supabase (applies migrations)
+        run: npm run db:start
+      - name: Write .env.local for the local stack
+        run: npm run env:local
+      - name: Integration tests
+        run: npm run test:integration
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+      - name: End-to-end tests
+        run: npm run test:e2e
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+      - name: Stop Supabase
+        if: always()
+        run: npx supabase stop --no-backup
+
+  deploy:
+    name: Deploy to production
+    needs: [checks, integration]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: production
+    concurrency:
+      group: production-deploy
+      cancel-in-progress: false
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - name: Check deployment secrets
+        id: secrets
+        run: |
+          missing=""
+          for name in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID SUPABASE_ACCESS_TOKEN SUPABASE_PROJECT_REF SUPABASE_DB_PASSWORD; do
+            if [ -z "${!name}" ]; then missing="$missing $name"; fi
+          done
+          if [ -n "$missing" ]; then
+            echo "::warning::Skipping deployment; missing GitHub secrets:$missing (see docs/DEPLOYMENT.md)"
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+      - run: npm ci
+        if: steps.secrets.outputs.ready == 'true'
+      # Migrations first: the new code may depend on them. Migrations are
+      # written to be backwards compatible with the previous release.
+      - name: Apply database migrations
+        if: steps.secrets.outputs.ready == 'true'
+        run: |
+          npx supabase link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
+          npx supabase db push --password "$SUPABASE_DB_PASSWORD"
+      - name: Pull Vercel production configuration
+        if: steps.secrets.outputs.ready == 'true'
+        run: npx vercel@65.12.1 pull --yes --environment=production --token="$VERCEL_TOKEN"
+      - name: Build
+        if: steps.secrets.outputs.ready == 'true'
+        run: npx vercel@65.12.1 build --prod --token="$VERCEL_TOKEN"
+      - name: Deploy
+        if: steps.secrets.outputs.ready == 'true'
+        run: |
+          url=$(npx vercel@65.12.1 deploy --prebuilt --prod --token="$VERCEL_TOKEN")
+          echo "Deployed to $url"
+          echo "### Deployed to production: $url" >> "$GITHUB_STEP_SUMMARY"
