@@ -12,8 +12,10 @@ export type Db = SupabaseClient<Database>;
  * runs as the `authenticated` role and is subject to RLS.
  */
 export async function createUserClient(): Promise<Db> {
-  const env = getEnv();
+  // Read cookies first: it marks the route as dynamic before any env access,
+  // so `next build` never tries to prerender authenticated pages.
   const cookieStore = await cookies();
+  const env = getEnv();
   return createServerClient<Database>(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_ANON_KEY, {
     cookies: {
       getAll() {

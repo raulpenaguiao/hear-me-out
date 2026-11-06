@@ -3,6 +3,9 @@ import { Logo } from "@/components/logo";
 import { DesktopNav, MobileNav } from "@/components/nav";
 import { requirePublisher } from "@/server/auth";
 
+// Every dashboard page is per-user; never prerender at build time.
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = { title: { default: "Painel", template: "%s · Ouve Isto" } };
 
 export default async function DashboardLayout({ children }: LayoutProps<"/painel">) {
