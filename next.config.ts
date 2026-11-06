@@ -13,7 +13,8 @@ const csp = [
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
-  "media-src 'self' blob:",
+  // R2 is allowed for AUDIO_DELIVERY_MODE=redirect (302 to a presigned URL).
+  "media-src 'self' blob: https://*.r2.cloudflarestorage.com",
   "font-src 'self'",
   `connect-src 'self' https://*.r2.cloudflarestorage.com${isDev ? " ws: http://127.0.0.1:* http://localhost:*" : ""}`,
   "frame-ancestors 'none'",

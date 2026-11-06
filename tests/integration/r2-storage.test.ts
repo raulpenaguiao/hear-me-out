@@ -45,7 +45,7 @@ describe.skipIf(!endpoint)("R2Storage against an S3-compatible endpoint", () => 
     const res = await fetch(presigned.url, {
       method: "PUT",
       headers: presigned.headers,
-      body: wav,
+      body: wav.slice(),
     });
     expect(res.status).toBe(200);
   });
@@ -90,6 +90,14 @@ describe.skipIf(!endpoint)("R2Storage against an S3-compatible endpoint", () => 
     });
     const signed = new URL(presigned.url).searchParams.get("X-Amz-SignedHeaders")?.split(";") ?? [];
     expect(signed).toEqual(expect.arrayContaining(["content-type", "content-length", "host"]));
+  });
+
+  it("moves objects between keys", async () => {
+    const target = `audio/moved/${crypto.randomUUID()}.wav`;
+    await storage.move(key, target);
+    expect(await storage.head(key)).toBeNull();
+    expect((await storage.head(target))?.size).toBe(wav.byteLength);
+    await storage.move(target, key);
   });
 
   it("deletes objects", async () => {

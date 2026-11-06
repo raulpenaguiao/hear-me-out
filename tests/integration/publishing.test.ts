@@ -353,6 +353,29 @@ describe("upload validation", () => {
     });
   });
 
+  it("moves verified uploads out of the client-writable staging area", async () => {
+    const wav = makeWav(0.2);
+    const created = await createUpload(ctx, {
+      kind: "audio",
+      episodeId,
+      fileName: "x.wav",
+      contentType: "audio/wav",
+      size: wav.byteLength,
+    });
+    const stagingKey = created.url.replace("memory://upload/", "");
+    expect(stagingKey.startsWith("uploads/")).toBe(true);
+    storage.put(stagingKey, wav);
+    await completeUpload(ctx, created.uploadId, { durationSeconds: 1 });
+    const finalKey = (await admin.from("episodes").select("audio_storage_key").eq("id", episodeId).single())
+      .data!.audio_storage_key!;
+    expect(finalKey.startsWith(`audio/`)).toBe(true);
+    expect(storage.objects.has(stagingKey)).toBe(false);
+    // A later re-PUT to the (still valid) presigned URL lands on the staging
+    // key and cannot change the published object.
+    storage.put(stagingKey, new TextEncoder().encode("<html>evil</html>"));
+    expect(storage.objects.get(finalKey)!.data).toEqual(wav);
+  });
+
   it("replaces previous audio and deletes the old object", async () => {
     await uploadAudio(ctx, episodeId, makeWav(0.2));
     const first = (await admin.from("episodes").select("audio_storage_key").eq("id", episodeId).single())

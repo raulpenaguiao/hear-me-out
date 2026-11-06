@@ -64,8 +64,9 @@ protection beyond the hosting platform, and compromise of the hosting accounts t
 ## Audio access
 
 - The R2 bucket is **private**. No public bucket URL or custom domain is needed or recommended.
-- Uploads use presigned PUT URLs (15 minutes by default) for a server-chosen key, with `Content-Type` and
-  `Content-Length` signed.
+- Uploads use presigned PUT URLs (15 minutes by default) for a server-chosen staging key under `uploads/`,
+  with `Content-Type` and `Content-Length` signed. After verification the server moves the object to its
+  final key and re-checks it there, so re-using a presigned URL later cannot change published audio.
 - In the default **proxy** mode, the application authorizes every byte-range request and streams the object.
   Revocation is immediate.
 - In **redirect** mode, each authorized request receives a fresh presigned GET URL valid for one hour.
@@ -95,7 +96,7 @@ protection beyond the hosting platform, and compromise of the hosting accounts t
 - **Service role key** bypasses RLS: only `src/server/supabase/admin.ts` uses it, server-side, and every use
   is preceded by an explicit ownership check or restricted to token lookups.
 - **Rate limiting** uses Postgres (`rate_limit_hit`) with HMAC'd keys (no raw IPs or e-mails stored).
-  Windows: login 10/15 min, sign-up 5/h, reset 5/h, upload URLs 60/h per user, rotations 20/h, channel
+  Windows: login 10/15 min per IP (not per e-mail, so nobody can lock a publisher out), sign-up 5/h, reset 5/h, upload URLs 60/h per user, rotations 20/h, channel
   creation 20/h, invalid tokens 60/10 min per IP. If the limiter errors, requests are allowed (fail open)
   and the error is logged.
 - **Security headers** (all routes): CSP, `Referrer-Policy: no-referrer`, `X-Content-Type-Options: nosniff`,

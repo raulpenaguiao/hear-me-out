@@ -83,19 +83,16 @@ You need accounts on **GitHub**, **Vercel**, **Supabase** and **Cloudflare**. Bu
 
 5. Set `R2_BUCKET` to the bucket name and `STORAGE_DRIVER=r2`.
 
-### R2 lifecycle (optional)
+### R2 lifecycle (recommended)
 
-Uploads that are started but never completed (e.g. the user closes the tab mid-upload) can leave objects
-without a database reference. They are harmless (private, unreferenced) but cost storage. The MVP does not
-clean them automatically. To find candidates:
+Browsers upload into a staging prefix, `uploads/`. When the server has verified an upload it moves the
+object to its final key (`audio/...` or `covers/...`). Anything left under `uploads/` is therefore an
+abandoned or rejected upload. Add a lifecycle rule in **Bucket → Settings → Object lifecycle rules**:
 
-```sql
-select storage_key from public.uploads
-where completed_at is null and expires_at < now() - interval '1 day';
-```
+- Prefix: `uploads/`
+- Action: delete objects **1 day** after upload
 
-Deleting those keys from R2 and then the rows is safe. Do **not** add a blanket R2 lifecycle expiry rule —
-it would delete published audio.
+Never add an expiry rule without the `uploads/` prefix — it would delete published audio.
 
 ## 3. Vercel
 
@@ -130,6 +127,9 @@ it would delete published audio.
    (`orgId` → `VERCEL_ORG_ID`, `projectId` → `VERCEL_PROJECT_ID`). `.vercel/` is git-ignored.
 
 ### Choosing `AUDIO_DELIVERY_MODE`
+
+**Recommendation for Vercel production: `redirect`.** `proxy` is the default because it needs no extra
+moving parts and works everywhere (local, CI, any Node host).
 
 - `proxy` (default): audio is streamed through a Vercel Function. The bucket stays completely hidden and
   revocation is instant. It costs Vercel function time and bandwidth, and very long downloads are bounded by

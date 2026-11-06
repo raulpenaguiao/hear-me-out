@@ -353,13 +353,15 @@ create policy "episodes: owner can delete"
 -- Upload completion (single transaction)
 -- ---------------------------------------------------------------------------
 
--- Attaches a verified upload to its episode (audio) or channel (cover) and
+-- Attaches a verified upload (already moved by the server from its staging
+-- key to p_final_key) to its episode (audio) or channel (cover) and
 -- marks the upload completed, atomically. Returns the storage key that was
 -- replaced (so the caller can delete the old object), or null.
 -- Called only by the server (service role) after it has verified the stored
 -- object's size and content.
 create or replace function public.complete_upload(
   p_upload_id uuid,
+  p_final_key text,
   p_owner_id uuid,
   p_mime_type text,
   p_size_bytes bigint,
@@ -385,6 +387,9 @@ begin
   if v_upload.completed_at is not null then
     raise exception 'upload already completed' using errcode = 'P0001';
   end if;
+  if p_final_key is null or p_final_key like 'uploads/%' then
+    raise exception 'invalid final key' using errcode = 'P0001';
+  end if;
 
   -- Re-check ownership of the target at completion time.
   if not exists (
@@ -404,7 +409,7 @@ begin
     end if;
 
     update public.episodes
-    set audio_storage_key = v_upload.storage_key,
+    set audio_storage_key = p_final_key,
         audio_mime_type = p_mime_type,
         audio_size_bytes = p_size_bytes,
         duration_seconds = p_duration_seconds
@@ -416,7 +421,7 @@ begin
     for update;
 
     update public.channels
-    set cover_image_key = v_upload.storage_key,
+    set cover_image_key = p_final_key,
         cover_image_mime_type = p_mime_type
     where id = v_upload.channel_id;
   end if;
@@ -427,8 +432,8 @@ begin
 end;
 $$;
 
-revoke all on function public.complete_upload(uuid, uuid, text, bigint, integer)
+revoke all on function public.complete_upload(uuid, text, uuid, text, bigint, integer)
   from public, anon, authenticated;
-grant execute on function public.complete_upload(uuid, uuid, text, bigint, integer) to service_role;
+grant execute on function public.complete_upload(uuid, text, uuid, text, bigint, integer) to service_role;
 
 revoke all on function public.owns_channel(uuid) from public;

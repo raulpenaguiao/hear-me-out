@@ -311,7 +311,8 @@ describe("public channel page data", () => {
     const view = await loadPublicChannelView(webToken, ctx);
     expect(view).not.toBeNull();
     expect(view!.episodes.map((e) => e.title)).toEqual(["Publicado"]);
-    expect(view!.episodes[0]!.audioUrl).toBe(`${APP}/audio/${published.guid}/${webToken}.mp3`);
+    expect(view!.episodes[0]!.audioUrl).toBe(`/audio/${published.guid}/${webToken}.mp3`);
+    expect(view!.coverUrl).toBe("/default-cover.png");
     expect(view!.feedUrl).toBe(`${APP}/rss/${rssToken}`);
     expect(JSON.stringify(view)).not.toMatch(/audio\/[0-9a-f-]+\/[0-9a-f-]+\.mp3"/); // no storage keys
   });

@@ -35,7 +35,8 @@ export async function signInAction(_prev: FormState, formData: FormData): Promis
     password: formData.get("password"),
   });
   if (!parsed.success) return { error: firstIssueMessage(parsed.error) };
-  if (!(await allowed(RATE_LIMITS.login, parsed.data.email))) return { error: TOO_MANY };
+  // Per IP only: keying on the e-mail would let anyone lock a publisher out.
+  if (!(await allowed(RATE_LIMITS.login))) return { error: TOO_MANY };
 
   const supabase = await createUserClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);

@@ -43,6 +43,9 @@ export interface ObjectStorage {
 
   delete(key: string): Promise<void>;
 
+  /** Moves an object to a new key (copy + delete). */
+  move(fromKey: string, toKey: string): Promise<void>;
+
   /**
    * Short-lived direct download URL (used by AUDIO_DELIVERY_MODE=redirect).
    * Null if the driver cannot provide one.

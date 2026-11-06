@@ -164,10 +164,10 @@ npm run test:integration   # needs the local Supabase stack and .env.local
 npm run test:e2e           # builds the app and runs Playwright against local Supabase + local storage
 ```
 
-- **Unit** (118 tests): token generation/hashing/encryption, XML escaping, RSS structure, audio format
+- **Unit** (122 tests): token generation/hashing/encryption, XML escaping, RSS structure, audio format
   sniffing, range parsing, validation, and the public feed/audio/cover handlers (authorization, revoked
   tokens, drafts, IDOR, Range/HEAD/304/416, rate limiting) with in-memory doubles.
-- **Integration** (29 tests + 6 opt-in): real Supabase — auth, RLS isolation, column privileges, privileged functions,
+- **Integration** (30 tests + 7 opt-in): real Supabase — auth, RLS isolation, column privileges, privileged functions,
   channel/episode lifecycle, feeds, token rotation, audio authorization, upload verification, rate limiter.
   The R2 adapter tests run when `S3_TEST_ENDPOINT` points at an S3-compatible server (MinIO, moto).
 - **E2E** (15 tests): registration, login/logout, channel creation, file upload, in-browser recording (fake
@@ -194,10 +194,12 @@ integration. Step-by-step instructions: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
 - **Durations** are measured in the browser (recorder timer or file metadata), not by the server.
 - **Uploads**: the presigned PUT signs the declared `Content-Type` and `Content-Length`, and the server
   re-verifies size and content after upload (deleting mismatches). The R2 adapter was tested against an
-  S3-compatible emulator (moto), not against Cloudflare R2 itself. Abandoned uploads (never completed) may
-  leave orphaned objects; see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md#r2-lifecycle-optional).
-- **Streaming via Vercel Functions** is subject to function duration limits and bandwidth costs; for very large
-  files or heavy traffic use `AUDIO_DELIVERY_MODE=redirect`.
+  S3-compatible emulator (moto), not against Cloudflare R2 itself. Uploads go to a staging prefix
+  (`uploads/`) and are moved on verification; configure an R2 lifecycle rule to expire abandoned uploads
+  ([docs/DEPLOYMENT.md](docs/DEPLOYMENT.md#r2-lifecycle-recommended)).
+- **Streaming via Vercel Functions** (`proxy` mode) is bound by the function duration limit (300 s), so slow
+  clients downloading large files may be cut off, and every byte costs function time. **Use
+  `AUDIO_DELIVERY_MODE=redirect` in production on Vercel.**
 - **Rate limiting** is per IP/user in Postgres (fixed windows); it is a speed bump, not DDoS protection.
 - The CSP allows `'unsafe-inline'` scripts (required by Next.js without nonces).
 - Dev-only tooling (`typescript-eslint` → `minimatch`) has moderate `npm audit` advisories; production

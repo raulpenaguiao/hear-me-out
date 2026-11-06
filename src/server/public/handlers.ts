@@ -231,6 +231,11 @@ export interface PublicChannelView {
   }>;
 }
 
+function relative(absoluteUrl: string): string {
+  const url = new URL(absoluteUrl);
+  return `${url.pathname}${url.search}`;
+}
+
 export async function loadPublicChannelView(
   rawToken: string,
   ctx: PublicContext,
@@ -244,7 +249,9 @@ export async function loadPublicChannelView(
     title: channel.title,
     description: channel.description,
     authorName: channel.authorName,
-    coverUrl: coverUrl(ctx.appUrl, token, channel.coverImageKey, channel.coverImageMimeType),
+    // Same-origin relative paths for resources the page itself loads, so the
+    // page works on any host it is served from (CSP is 'self').
+    coverUrl: relative(coverUrl(ctx.appUrl, token, channel.coverImageKey, channel.coverImageMimeType)),
     feedUrl: feedUrl(ctx.appUrl, rssToken),
     pageUrl: channelPageUrl(ctx.appUrl, token),
     episodes: episodes
@@ -255,7 +262,7 @@ export async function loadPublicChannelView(
         description: ep.description,
         durationSeconds: ep.durationSeconds,
         publishedAt: ep.publishedAt.toISOString(),
-        audioUrl: audioUrl(ctx.appUrl, ep.guid, token, ep.audioMimeType),
+        audioUrl: relative(audioUrl(ctx.appUrl, ep.guid, token, ep.audioMimeType)),
         mimeType: ep.audioMimeType,
       })),
   };

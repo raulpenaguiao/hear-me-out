@@ -15,6 +15,20 @@ import { assertOwnsChannel } from "./channels";
 import type { PublisherContext } from "./context";
 import { internalError, notFoundError, rateLimitedError, ServiceError } from "./errors";
 
+export const STAGING_PREFIX = "uploads/";
+
+function finalKeyFor(upload: {
+  kind: "audio" | "cover";
+  channel_id: string;
+  episode_id: string | null;
+  storage_key: string;
+}): string {
+  const file = upload.storage_key.split("/").at(-1)!;
+  return upload.kind === "audio"
+    ? `audio/${upload.channel_id}/${upload.episode_id}/${file}`
+    : `covers/${upload.channel_id}/${file}`;
+}
+
 export interface CreatedUpload {
   uploadId: string;
   url: string;
@@ -82,12 +96,11 @@ export async function createUpload(ctx: PublisherContext, input: CreateUploadInp
 
   if (!(await ctx.rateLimit(RATE_LIMITS.uploadUrl, ctx.userId))) throw rateLimitedError();
 
-  // Server-chosen, unguessable key. Never derived from the client file name.
-  const random = randomBytes(16).toString("hex");
-  const key =
-    input.kind === "audio"
-      ? `audio/${channelId}/${episodeId}/${random}.${extension}`
-      : `covers/${channelId}/${random}.${extension}`;
+  // Server-chosen, unguessable staging key, never derived from the file name.
+  // The client can only ever write under uploads/; verified objects are moved
+  // to their final key (see completeUpload), so a presigned URL reused after
+  // verification cannot alter published audio.
+  const key = `${STAGING_PREFIX}${channelId}/${randomBytes(16).toString("hex")}.${extension}`;
 
   const expiresAt = new Date(Date.now() + ctx.limits.uploadUrlTtlSeconds * 1000);
   const { data: upload, error } = await ctx.admin
@@ -190,8 +203,30 @@ export async function completeUpload(
     return reject("O ficheiro não parece ser uma imagem válida no formato indicado.");
   }
 
+  // Move out of the client-writable staging area, then re-verify the bytes
+  // that will actually be served (closes the window between check and move).
+  const finalKey = finalKeyFor(upload);
+  try {
+    await ctx.storage.move(upload.storage_key, finalKey);
+  } catch {
+    throw internalError();
+  }
+  const finalInfo = await ctx.storage.head(finalKey);
+  const finalPrefix = await ctx.storage.readPrefix(finalKey, SNIFF_BYTES);
+  const stillValid =
+    finalInfo?.size === info.size &&
+    finalPrefix !== null &&
+    (upload.kind === "audio"
+      ? sniffAudioFormat(finalPrefix) === sniffAudioFormat(prefix)
+      : sniffImageMimeType(finalPrefix) === upload.declared_mime_type);
+  if (!stillValid) {
+    await ctx.storage.delete(finalKey).catch(() => undefined);
+    throw new ServiceError("upload_invalid", "O ficheiro mudou durante a verificação. Tenta novamente.");
+  }
+
   const { data: previousKey, error: rpcError } = await ctx.admin.rpc("complete_upload", {
     p_upload_id: upload.id,
+    p_final_key: finalKey,
     p_owner_id: ctx.userId,
     p_mime_type: upload.declared_mime_type,
     p_size_bytes: info.size,
@@ -199,10 +234,11 @@ export async function completeUpload(
     p_duration_seconds: durationSeconds as number,
   });
   if (rpcError) {
+    await ctx.storage.delete(finalKey).catch(() => undefined);
     if (rpcError.code === "P0002") throw notFoundError();
     throw internalError();
   }
-  if (previousKey && previousKey !== upload.storage_key) {
+  if (previousKey && previousKey !== finalKey) {
     await ctx.storage.delete(previousKey).catch(() => undefined);
   }
 

@@ -55,6 +55,13 @@ export class MemoryStorage implements ObjectStorage {
     this.objects.delete(key);
   }
 
+  async move(fromKey: string, toKey: string): Promise<void> {
+    const obj = this.objects.get(fromKey);
+    if (!obj) throw new Error("NoSuchKey");
+    this.objects.set(toKey, obj);
+    this.objects.delete(fromKey);
+  }
+
   async createDownloadUrl(input: { key: string }): Promise<string | null> {
     return `https://storage.invalid/${input.key}?signed=1`;
   }

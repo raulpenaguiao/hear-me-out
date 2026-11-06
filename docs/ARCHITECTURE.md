@@ -106,9 +106,11 @@ Supabase Auth with e-mail + password, using `@supabase/ssr` cookie sessions:
 
 ## Audio storage
 
-Object keys are chosen by the server and never derived from file names:
+Object keys are chosen by the server and never derived from file names. Browsers can only write to the
+staging prefix; verified objects are moved to their final key:
 
 ```
+uploads/<channel_id>/<random-128-bit>.<ext>          (staging, client-writable via presigned PUT)
 audio/<channel_id>/<episode_id>/<random-128-bit>.<ext>
 covers/<channel_id>/<random-128-bit>.<ext>
 ```
@@ -121,8 +123,8 @@ Upload flow:
 2. Browser `PUT`s the file straight to R2 with progress reporting (XHR).
 3. `POST /api/publisher/uploads/:id/complete` — `HEAD`s the object, requires the stored size to equal the
    declared size and be within limits, reads the first 4 KiB and **sniffs the container format** (MP3/ID3,
-   ADTS AAC, MP4/M4A, WAV, WebM/EBML, Ogg; JPEG/PNG/WebP for covers), checks the duration limit, then calls
-   `complete_upload`. Rejected objects are deleted. A replaced object is deleted after the swap.
+   ADTS AAC, MP4/M4A, WAV, WebM/EBML, Ogg; JPEG/PNG/WebP for covers), checks the duration limit, then moves the
+   object out of `uploads/`, re-verifies it at the final key and calls `complete_upload`. Rejected objects are deleted. A replaced object is deleted after the swap.
 
 The local adapter emulates step 1–2 with HMAC-signed URLs handled by `/api/dev-storage/upload`.
 

@@ -130,7 +130,7 @@ isOneToOne: false
           }
           Functions: {
             "complete_upload":
-{ Args: { "p_duration_seconds": number,"p_mime_type": string,"p_owner_id": string,"p_size_bytes": number,"p_upload_id": string }; Returns: string
+{ Args: { "p_duration_seconds": number,"p_final_key": string,"p_mime_type": string,"p_owner_id": string,"p_size_bytes": number,"p_upload_id": string }; Returns: string
                            },
 "owns_channel":
 { Args: { "p_channel_id": string }; Returns: boolean

@@ -93,9 +93,19 @@ export const profileSchema = z.object({
 
 /** Only allow same-origin relative redirects (prevents open redirects). */
 export function safeRedirectPath(value: unknown, fallback = "/painel"): string {
-  if (typeof value !== "string") return fallback;
-  if (!value.startsWith("/") || value.startsWith("//") || value.startsWith("/\\")) return fallback;
-  return value;
+  if (typeof value !== "string" || value.length > 512) return fallback;
+  // Reject backslashes and control characters (URL parsers strip tabs/newlines,
+  // turning "/\t/evil.example" into "//evil.example").
+  if (!value.startsWith("/") || /[\\\u0000-\u001F\u007F]/.test(value)) return fallback;
+  const base = "https://ouve-isto.invalid";
+  let url: URL;
+  try {
+    url = new URL(value, base);
+  } catch {
+    return fallback;
+  }
+  if (url.origin !== base) return fallback;
+  return `${url.pathname}${url.search}${url.hash}`;
 }
 
 export function firstIssueMessage(error: z.ZodError): string {

@@ -169,6 +169,7 @@ describe("row level security", () => {
   it("does not let authenticated users call privileged functions", async () => {
     const res = await alice.client.rpc("complete_upload", {
       p_upload_id: crypto.randomUUID(),
+      p_final_key: "audio/x/y.mp3",
       p_owner_id: alice.id,
       p_mime_type: "audio/mpeg",
       p_size_bytes: 1,

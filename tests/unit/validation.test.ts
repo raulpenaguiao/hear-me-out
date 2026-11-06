@@ -87,6 +87,10 @@ describe("safeRedirectPath", () => {
     ["//evil.example", "/painel"],
     ["/\\evil.example", "/painel"],
     [undefined, "/painel"],
+    ["/\t/evil.example", "/painel"],
+    ["/%09/evil.example", "/%09/evil.example"],
+    ["/\n/evil.example", "/painel"],
+    ["/painel?x=1#y", "/painel?x=1#y"],
     [["/a"], "/painel"],
   ])("maps %s to %s", (input, expected) => {
     expect(safeRedirectPath(input)).toBe(expected);

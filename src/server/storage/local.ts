@@ -153,6 +153,12 @@ export class LocalStorage implements ObjectStorage {
     await rm(this.filePath(key), { force: true });
   }
 
+  async move(fromKey: string, toKey: string): Promise<void> {
+    const target = this.filePath(toKey);
+    await mkdir(path.dirname(target), { recursive: true });
+    await rename(this.filePath(fromKey), target);
+  }
+
   async createDownloadUrl(): Promise<string | null> {
     return null;
   }
