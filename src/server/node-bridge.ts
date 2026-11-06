@@ -19,7 +19,11 @@ export function toWebRequest(req: IncomingMessage, origin: string): Request {
   return new Request(new URL(req.url ?? "/", origin), { method: req.method ?? "GET", headers });
 }
 
-export async function sendWebResponse(response: Response, res: ServerResponse, method: string): Promise<void> {
+export async function sendWebResponse(
+  response: Response,
+  res: ServerResponse,
+  method: string,
+): Promise<void> {
   res.statusCode = response.status;
   response.headers.forEach((value, name) => res.setHeader(name, value));
   if (!response.body || method.toUpperCase() === "HEAD") {

@@ -93,7 +93,11 @@ describe("row level security", () => {
   });
 
   it("prevents modifying or deleting other users' rows", async () => {
-    const update = await bob.client.from("channels").update({ title: "hacked" }).eq("id", aliceChannelId).select();
+    const update = await bob.client
+      .from("channels")
+      .update({ title: "hacked" })
+      .eq("id", aliceChannelId)
+      .select();
     expect(update.data ?? []).toEqual([]);
     const del = await bob.client.from("episodes").delete().eq("id", aliceEpisodeId).select();
     expect(del.data ?? []).toEqual([]);
@@ -110,7 +114,12 @@ describe("row level security", () => {
   });
 
   it("does not expose token hashes or ciphertexts to the authenticated role", async () => {
-    for (const column of ["web_token_hash", "rss_token_hash", "web_token_ciphertext", "rss_token_ciphertext"]) {
+    for (const column of [
+      "web_token_hash",
+      "rss_token_hash",
+      "web_token_ciphertext",
+      "rss_token_ciphertext",
+    ]) {
       const res = await alice.client.from("channels").select(column).eq("id", aliceChannelId);
       expect(res.error, column).not.toBeNull();
     }
@@ -179,7 +188,11 @@ describe("database rate limiter", () => {
     const key = `test:${crypto.randomUUID()}`;
     const results: boolean[] = [];
     for (let i = 0; i < 4; i++) {
-      const { data } = await admin.rpc("rate_limit_hit", { p_key: key, p_window_seconds: 600, p_max_hits: 3 });
+      const { data } = await admin.rpc("rate_limit_hit", {
+        p_key: key,
+        p_window_seconds: 600,
+        p_max_hits: 3,
+      });
       results.push(data === true);
     }
     expect(results).toEqual([true, true, true, false]);

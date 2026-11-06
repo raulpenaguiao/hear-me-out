@@ -85,8 +85,20 @@ async function main() {
   });
 
   const episodes = [
-    { title: "O dia em que perdi o comboio", description: "E ganhei um amigo.", seconds: 4, freq: 330, publish: true },
-    { title: "A receita da avó", description: "Arroz doce & segredos.", seconds: 6, freq: 440, publish: true },
+    {
+      title: "O dia em que perdi o comboio",
+      description: "E ganhei um amigo.",
+      seconds: 4,
+      freq: 330,
+      publish: true,
+    },
+    {
+      title: "A receita da avó",
+      description: "Arroz doce & segredos.",
+      seconds: 6,
+      freq: 440,
+      publish: true,
+    },
     { title: "Ainda em rascunho", description: "", seconds: 3, freq: 550, publish: false },
   ];
 

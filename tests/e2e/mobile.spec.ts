@@ -21,4 +21,15 @@ test("mobile dashboard shows the bottom navigation with a record button", async 
   await expect(nav.getByRole("link", { name: "Gravar" })).toBeVisible();
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(0);
+
+  // Long secret URLs must not push the channel page wider than the screen.
+  await page.goto("/painel/canais/novo");
+  await page.getByLabel("Nome do canal").fill("Canal no telemóvel");
+  await page.getByRole("button", { name: "Criar canal" }).click();
+  await expect(page.getByTestId("rss-url")).toBeVisible();
+  const channelOverflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  expect(channelOverflow).toBeLessThanOrEqual(0);
+  await page.goto("/painel/gravar");
+  const recordOverflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  expect(recordOverflow).toBeLessThanOrEqual(0);
 });

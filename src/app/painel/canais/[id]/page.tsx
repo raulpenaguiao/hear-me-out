@@ -58,8 +58,8 @@ export default async function ChannelPage({ params, searchParams }: PageProps<"/
         </p>
       ) : null}
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
-        <div className="flex flex-col gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+        <div className="flex min-w-0 flex-col gap-6">
           <Card>
             <div className="mb-2 flex items-center justify-between gap-2">
               <CardTitle>Episódios</CardTitle>
@@ -87,7 +87,7 @@ export default async function ChannelPage({ params, searchParams }: PageProps<"/
           </Card>
         </div>
 
-        <div className="flex flex-col gap-6">
+        <div className="flex min-w-0 flex-col gap-6">
           <Card className="flex flex-col items-center gap-4 text-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -108,8 +108,8 @@ export default async function ChannelPage({ params, searchParams }: PageProps<"/
               Revogar acesso
             </CardTitle>
             <p className="mb-4 text-sm text-muted-foreground">
-              Gera links novos. Os antigos deixam de funcionar de imediato — terás de partilhar os novos com quem
-              deve continuar a ouvir. Ficheiros já descarregados não podem ser apagados dos dispositivos.
+              Gera links novos. Os antigos deixam de funcionar de imediato — terás de partilhar os novos com
+              quem deve continuar a ouvir. Ficheiros já descarregados não podem ser apagados dos dispositivos.
             </p>
             <p className="mb-4 text-xs text-muted-foreground">
               Última alteração: {formatDateTime(channel.tokensRotatedAt)}
@@ -149,7 +149,8 @@ export default async function ChannelPage({ params, searchParams }: PageProps<"/
                 confirmLabel="Apagar definitivamente"
                 message={
                   <>
-                    Vais apagar <strong>{channel.title}</strong> e {episodes.length} episódio(s). Tens a certeza?
+                    Vais apagar <strong>{channel.title}</strong> e {episodes.length} episódio(s). Tens a
+                    certeza?
                   </>
                 }
               />

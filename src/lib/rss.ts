@@ -129,11 +129,7 @@ export function buildFeedXml(
     el("lastBuildDate", toRfc822(channel.lastBuildDate)),
     el("generator", "Ouve Isto"),
     el("atom:link", null, { href: links.feedUrl, rel: "self", type: "application/rss+xml" }),
-    el("image", [
-      el("url", links.imageUrl),
-      el("title", channel.title),
-      el("link", links.siteUrl),
-    ]),
+    el("image", [el("url", links.imageUrl), el("title", channel.title), el("link", links.siteUrl)]),
     el("itunes:author", author),
     el("itunes:summary", truncate(description, 4000)),
     el("itunes:type", "episodic"),

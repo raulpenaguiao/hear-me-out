@@ -14,12 +14,7 @@ import {
   uuidSchema,
 } from "@/lib/validation";
 import { requirePublisher } from "@/server/auth";
-import {
-  createChannel,
-  deleteChannel,
-  rotateChannelTokens,
-  updateChannel,
-} from "@/server/services/channels";
+import { createChannel, deleteChannel, rotateChannelTokens, updateChannel } from "@/server/services/channels";
 import { deleteEpisode, setEpisodeStatus, updateEpisode } from "@/server/services/episodes";
 import { ServiceError } from "@/server/services/errors";
 

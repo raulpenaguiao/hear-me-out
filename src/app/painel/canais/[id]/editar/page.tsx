@@ -18,7 +18,10 @@ export default async function EditChannelPage({ params }: PageProps<"/painel/can
 
   return (
     <div className="mx-auto max-w-xl">
-      <PageHeader title="Editar canal" back={{ href: `/painel/canais/${channel.id}`, label: channel.title }} />
+      <PageHeader
+        title="Editar canal"
+        back={{ href: `/painel/canais/${channel.id}`, label: channel.title }}
+      />
       <Card>
         <ActionForm action={updateChannelAction}>
           <input type="hidden" name="channelId" value={channel.id} />

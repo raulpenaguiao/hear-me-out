@@ -24,8 +24,8 @@ export default async function DashboardPage() {
     <>
       <PageHeader title={name ? `Olá, ${name}!` : "Olá!"} description="O que vais contar hoje?" />
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Card className="flex flex-col items-start justify-between gap-4 bg-primary text-primary-foreground sm:col-span-1">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+        <Card className="flex flex-col items-start justify-between gap-4 col-span-2 bg-primary text-primary-foreground sm:col-span-1">
           <div>
             <p className="text-sm opacity-90">Tens uma história para contar?</p>
             <p className="text-xl font-semibold">Grava um episódio</p>

@@ -140,10 +140,7 @@ function isAdtsFrame(b0: number, b1: number): boolean {
 function skipId3(bytes: Uint8Array): number {
   if (ascii(bytes, 0, 3) !== "ID3" || bytes.length < 10) return 0;
   const size =
-    ((bytes[6]! & 0x7f) << 21) |
-    ((bytes[7]! & 0x7f) << 14) |
-    ((bytes[8]! & 0x7f) << 7) |
-    (bytes[9]! & 0x7f);
+    ((bytes[6]! & 0x7f) << 21) | ((bytes[7]! & 0x7f) << 14) | ((bytes[8]! & 0x7f) << 7) | (bytes[9]! & 0x7f);
   const footer = (bytes[5]! & 0x10) !== 0 ? 10 : 0;
   return 10 + size + footer;
 }
@@ -211,12 +208,7 @@ export function imageFormatByMimeType(mime: string): ImageFormat | null {
 export function sniffImageMimeType(bytes: Uint8Array): string | null {
   if (bytes.length < 12) return null;
   if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return "image/jpeg";
-  if (
-    bytes[0] === 0x89 &&
-    ascii(bytes, 1, 3) === "PNG" &&
-    bytes[4] === 0x0d &&
-    bytes[5] === 0x0a
-  )
+  if (bytes[0] === 0x89 && ascii(bytes, 1, 3) === "PNG" && bytes[4] === 0x0d && bytes[5] === 0x0a)
     return "image/png";
   if (ascii(bytes, 0, 4) === "RIFF" && ascii(bytes, 8, 4) === "WEBP") return "image/webp";
   return null;

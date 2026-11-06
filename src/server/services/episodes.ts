@@ -81,7 +81,11 @@ export async function countPublishedEpisodes(ctx: PublisherContext): Promise<num
 }
 
 export async function getEpisode(ctx: PublisherContext, episodeId: string): Promise<EpisodeSummary> {
-  const { data, error } = await ctx.db.from("episodes").select(EPISODE_COLUMNS).eq("id", episodeId).maybeSingle();
+  const { data, error } = await ctx.db
+    .from("episodes")
+    .select(EPISODE_COLUMNS)
+    .eq("id", episodeId)
+    .maybeSingle();
   if (error) throw internalError();
   if (!data) throw notFoundError();
   return toSummary(data as unknown as EpisodeRow);
@@ -148,11 +152,7 @@ export async function setEpisodeStatus(
   episodeId: string,
   status: "draft" | "published",
 ): Promise<void> {
-  const { data, error } = await ctx.db
-    .from("episodes")
-    .update({ status })
-    .eq("id", episodeId)
-    .select("id");
+  const { data, error } = await ctx.db.from("episodes").update({ status }).eq("id", episodeId).select("id");
   if (error) {
     if (error.code === "23514") {
       throw new ServiceError("invalid_input", "Adiciona áudio ao episódio antes de o publicar.");
@@ -162,7 +162,10 @@ export async function setEpisodeStatus(
   if (!data || data.length === 0) throw notFoundError();
 }
 
-export async function deleteEpisode(ctx: PublisherContext, episodeId: string): Promise<{ channelId: string }> {
+export async function deleteEpisode(
+  ctx: PublisherContext,
+  episodeId: string,
+): Promise<{ channelId: string }> {
   const { data: episode, error: readError } = await ctx.db
     .from("episodes")
     .select("id, channel_id, audio_storage_key")

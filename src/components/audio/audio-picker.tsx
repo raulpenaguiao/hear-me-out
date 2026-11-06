@@ -53,11 +53,7 @@ export function AudioPicker({
   disabled?: boolean;
 }) {
   // null while server-rendering; true/false once known in the browser.
-  const supported = useSyncExternalStore<boolean | null>(
-    noopSubscribe,
-    isRecordingSupported,
-    () => null,
-  );
+  const supported = useSyncExternalStore<boolean | null>(noopSubscribe, isRecordingSupported, () => null);
   const [chosenMode, setMode] = useState<"record" | "upload">("record");
   const mode = supported === false ? "upload" : chosenMode;
   const [error, setError] = useState<string | null>(null);
@@ -74,8 +70,7 @@ export function AudioPicker({
     setError(null);
     if (!file) return;
     const ext = fileExtension(file.name);
-    const format =
-      (file.type ? formatByMimeType(file.type) : null) ?? (ext ? formatByExtension(ext) : null);
+    const format = (file.type ? formatByMimeType(file.type) : null) ?? (ext ? formatByExtension(ext) : null);
     if (!format) {
       setError("Formato não suportado. Usa MP3, M4A, AAC, WAV ou WebM/Opus.");
       return;
@@ -100,7 +95,7 @@ export function AudioPicker({
 
   const tabClass = (active: boolean) =>
     cn(
-      "flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors",
+      "flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium transition-colors",
       active ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
     );
 

@@ -36,9 +36,7 @@ export default async function EpisodePage({ params, searchParams }: PageProps<"/
         }
       />
 
-      {query.publicado ? (
-        <Notice>Publicado! Já aparece na página do canal e no feed RSS.</Notice>
-      ) : null}
+      {query.publicado ? <Notice>Publicado! Já aparece na página do canal e no feed RSS.</Notice> : null}
       {query.guardado ? <Notice>Rascunho guardado. Publica quando quiseres.</Notice> : null}
 
       <div className="flex flex-col gap-6">

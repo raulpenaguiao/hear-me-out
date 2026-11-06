@@ -46,7 +46,11 @@ export function CoverUpload({ channelId, maxBytes }: { channelId: string; maxByt
     <div className="flex flex-col gap-2">
       <label
         htmlFor={id}
-        className={cn(buttonVariants({ variant: "outline", size: "sm" }), "cursor-pointer", busy && "opacity-60")}
+        className={cn(
+          buttonVariants({ variant: "outline", size: "sm" }),
+          "cursor-pointer",
+          busy && "opacity-60",
+        )}
       >
         {busy ? <Loader2 className="animate-spin" aria-hidden /> : <ImagePlus aria-hidden />}
         {busy ? "A enviar…" : "Mudar capa"}

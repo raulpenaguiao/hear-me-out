@@ -75,10 +75,6 @@ export function serializeDocument(root: XmlNode, pretty = true): string {
 }
 
 /** Helper to build optional nodes without noisy conditionals. */
-export function el(
-  name: string,
-  children?: string | XmlNode[] | null,
-  attributes?: XmlAttributes,
-): XmlNode {
+export function el(name: string, children?: string | XmlNode[] | null, attributes?: XmlAttributes): XmlNode {
   return { name, attributes, children: children ?? undefined };
 }

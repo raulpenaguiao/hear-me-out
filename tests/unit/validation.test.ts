@@ -17,7 +17,9 @@ describe("episode validation", () => {
   it("limits lengths", () => {
     expect(episodeInputSchema.safeParse({ title: "a".repeat(201) }).success).toBe(false);
     expect(episodeInputSchema.safeParse({ title: "a", description: "a".repeat(10001) }).success).toBe(false);
-    expect(episodeInputSchema.safeParse({ title: "a".repeat(200), description: "a".repeat(10000) }).success).toBe(true);
+    expect(
+      episodeInputSchema.safeParse({ title: "a".repeat(200), description: "a".repeat(10000) }).success,
+    ).toBe(true);
   });
 
   it("returns pt-PT messages", () => {
@@ -45,11 +47,18 @@ describe("channel validation", () => {
 
 describe("upload validation", () => {
   it("requires positive integer sizes and a valid target", () => {
-    const base = { kind: "audio", episodeId: crypto.randomUUID(), fileName: "a.mp3", contentType: "audio/mpeg" };
+    const base = {
+      kind: "audio",
+      episodeId: crypto.randomUUID(),
+      fileName: "a.mp3",
+      contentType: "audio/mpeg",
+    };
     expect(createUploadSchema.safeParse({ ...base, size: 10 }).success).toBe(true);
     expect(createUploadSchema.safeParse({ ...base, size: 0 }).success).toBe(false);
     expect(createUploadSchema.safeParse({ ...base, size: 1.5 }).success).toBe(false);
-    expect(createUploadSchema.safeParse({ ...base, episodeId: "1; drop table", size: 10 }).success).toBe(false);
+    expect(createUploadSchema.safeParse({ ...base, episodeId: "1; drop table", size: 10 }).success).toBe(
+      false,
+    );
     expect(createUploadSchema.safeParse({ ...base, kind: "video", size: 10 }).success).toBe(false);
   });
 
@@ -63,7 +72,9 @@ describe("upload validation", () => {
 
 describe("auth validation", () => {
   it("normalises e-mails and enforces password length", () => {
-    expect(signUpSchema.parse({ email: " Ana@Example.PT ", password: "12345678" }).email).toBe("ana@example.pt");
+    expect(signUpSchema.parse({ email: " Ana@Example.PT ", password: "12345678" }).email).toBe(
+      "ana@example.pt",
+    );
     expect(signUpSchema.safeParse({ email: "ana@example.pt", password: "short" }).success).toBe(false);
     expect(signUpSchema.safeParse({ email: "not-an-email", password: "12345678" }).success).toBe(false);
   });

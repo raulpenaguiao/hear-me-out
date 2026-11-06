@@ -4,7 +4,13 @@ import { formatDate, formatDuration } from "@/lib/format";
 import type { EpisodeSummary } from "@/server/services/episodes";
 import { Badge } from "../ui/card";
 
-export function EpisodeRow({ episode, showChannel = false }: { episode: EpisodeSummary; showChannel?: boolean }) {
+export function EpisodeRow({
+  episode,
+  showChannel = false,
+}: {
+  episode: EpisodeSummary;
+  showChannel?: boolean;
+}) {
   return (
     <li>
       <Link

@@ -5,12 +5,7 @@
 export class ServiceError extends Error {
   constructor(
     readonly code:
-      | "not_found"
-      | "invalid_input"
-      | "rate_limited"
-      | "conflict"
-      | "upload_invalid"
-      | "internal",
+      "not_found" | "invalid_input" | "rate_limited" | "conflict" | "upload_invalid" | "internal",
     message: string,
     readonly status: number = codeToStatus(code),
   ) {

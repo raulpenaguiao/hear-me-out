@@ -44,7 +44,11 @@ export default async function ChannelsPage({ searchParams }: PageProps<"/painel/
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={channel.hasCover ? `/api/publisher/channels/${channel.id}/cover?v=${encodeURIComponent(channel.updatedAt)}` : "/default-cover.png"}
+                  src={
+                    channel.hasCover
+                      ? `/api/publisher/channels/${channel.id}/cover?v=${encodeURIComponent(channel.updatedAt)}`
+                      : "/default-cover.png"
+                  }
                   alt=""
                   className="size-16 shrink-0 rounded-xl object-cover"
                 />

@@ -31,9 +31,7 @@ export async function apiPost<T>(path: string, body: unknown): Promise<T> {
     throw new ApiError("Sem ligação. Verifica a tua internet e tenta novamente.", 0);
   }
   const data = (await res.json().catch(() => null)) as
-    | (T & { error?: undefined })
-    | { error: { code: string; message: string } }
-    | null;
+    (T & { error?: undefined }) | { error: { code: string; message: string } } | null;
   if (!res.ok || !data || (data as { error?: unknown }).error) {
     const err = (data as { error?: { code: string; message: string } } | null)?.error;
     throw new ApiError(err?.message ?? "Ocorreu um erro inesperado.", res.status, err?.code);
@@ -65,8 +63,7 @@ function putWithProgress(
       if (xhr.status >= 200 && xhr.status < 300) resolve();
       else reject(new ApiError("O envio do ficheiro falhou. Tenta novamente.", xhr.status));
     };
-    xhr.onerror = () =>
-      reject(new ApiError("O envio do ficheiro falhou. Verifica a tua ligação.", 0));
+    xhr.onerror = () => reject(new ApiError("O envio do ficheiro falhou. Verifica a tua ligação.", 0));
     xhr.onabort = () => reject(new ApiError("Envio cancelado.", 0, "aborted"));
     signal?.addEventListener("abort", () => xhr.abort(), { once: true });
     xhr.send(body);
@@ -93,7 +90,9 @@ export async function uploadFile(opts: {
   await putWithProgress(created, opts.body, opts.onProgress, opts.signal);
   await apiPost(`/api/publisher/uploads/${created.uploadId}/complete`, {
     durationSeconds:
-      opts.durationSeconds !== undefined && opts.durationSeconds !== null && Number.isFinite(opts.durationSeconds)
+      opts.durationSeconds !== undefined &&
+      opts.durationSeconds !== null &&
+      Number.isFinite(opts.durationSeconds)
         ? opts.durationSeconds
         : null,
   });

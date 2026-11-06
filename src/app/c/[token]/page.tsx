@@ -53,7 +53,8 @@ export default async function PublicChannelPage({ params }: PageProps<"/c/[token
         </h2>
         {view.episodes.length === 0 ? (
           <p className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-            Ainda não há episódios publicados. Volta mais tarde — ou subscreve o RSS para saberes quando houver.
+            Ainda não há episódios publicados. Volta mais tarde — ou subscreve o RSS para saberes quando
+            houver.
           </p>
         ) : (
           <ol className="flex flex-col gap-3">
@@ -71,8 +72,8 @@ export default async function PublicChannelPage({ params }: PageProps<"/c/[token
                   </p>
                 </div>
                 <audio controls preload="none" aria-label={`Ouvir: ${episode.title}`}>
-                  <source src={episode.audioUrl} type={episode.mimeType} />
-                  O teu navegador não consegue tocar este áudio.
+                  <source src={episode.audioUrl} type={episode.mimeType} />O teu navegador não consegue tocar
+                  este áudio.
                 </audio>
                 {episode.description ? (
                   <p className="whitespace-pre-line text-sm text-muted-foreground">{episode.description}</p>
@@ -92,8 +93,8 @@ export default async function PublicChannelPage({ params }: PageProps<"/c/[token
           Subscrever numa app de podcasts
         </h2>
         <p className="text-sm">
-          Copia este link RSS para a tua app de podcasts preferida para seguires este canal. Os episódios novos
-          aparecem automaticamente.
+          Copia este link RSS para a tua app de podcasts preferida para seguires este canal. Os episódios
+          novos aparecem automaticamente.
         </p>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <code
@@ -108,8 +109,8 @@ export default async function PublicChannelPage({ params }: PageProps<"/c/[token
           <summary className="cursor-pointer font-medium">Como adicionar na minha app?</summary>
           <ul className="mt-3 flex list-disc flex-col gap-2 pl-5">
             <li>
-              <strong>Apple Podcasts (iPhone/iPad):</strong> abre a app, vai a <em>Biblioteca</em>, toca nos três
-              pontos (ou em <em>Editar</em>) e escolhe <em>Seguir um programa por URL…</em>. Cola o link.
+              <strong>Apple Podcasts (iPhone/iPad):</strong> abre a app, vai a <em>Biblioteca</em>, toca nos
+              três pontos (ou em <em>Editar</em>) e escolhe <em>Seguir um programa por URL…</em>. Cola o link.
             </li>
             <li>
               <strong>Apple Podcasts (Mac):</strong> menu <em>Ficheiro → Seguir um programa por URL…</em>.
@@ -119,8 +120,8 @@ export default async function PublicChannelPage({ params }: PageProps<"/c/[token
               <em>Adicionar por URL</em> / <em>Add RSS feed</em> e cola o link.
             </li>
             <li>
-              <strong>Spotify e YouTube Music</strong> não aceitam feeds privados. Usa uma das apps acima ou ouve
-              aqui mesmo.
+              <strong>Spotify e YouTube Music</strong> não aceitam feeds privados. Usa uma das apps acima ou
+              ouve aqui mesmo.
             </li>
           </ul>
         </details>
@@ -129,8 +130,8 @@ export default async function PublicChannelPage({ params }: PageProps<"/c/[token
       <footer className="flex flex-col items-center gap-2 pt-4 text-center text-xs text-muted-foreground">
         <LogoMark className="size-6" />
         <p>
-          Este é um canal privado do Ouve Isto. Quem tiver este link pode ouvir — partilha-o só com quem o autor
-          quiser.
+          Este é um canal privado do Ouve Isto. Quem tiver este link pode ouvir — partilha-o só com quem o
+          autor quiser.
         </p>
       </footer>
     </main>

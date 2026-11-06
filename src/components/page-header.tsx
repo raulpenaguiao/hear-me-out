@@ -26,7 +26,9 @@ export function PageHeader({
       ) : null}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="min-w-0">
-          <h1 className="text-2xl font-semibold tracking-tight text-balance break-words sm:text-3xl">{title}</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-balance break-words sm:text-3xl">
+            {title}
+          </h1>
           {description ? <p className="mt-1 text-muted-foreground">{description}</p> : null}
         </div>
         {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
@@ -35,7 +37,15 @@ export function PageHeader({
   );
 }
 
-export function EmptyState({ icon, title, children }: { icon: ReactNode; title: string; children?: ReactNode }) {
+export function EmptyState({
+  icon,
+  title,
+  children,
+}: {
+  icon: ReactNode;
+  title: string;
+  children?: ReactNode;
+}) {
   return (
     <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border px-6 py-12 text-center">
       <div className="flex size-12 items-center justify-center rounded-full bg-accent text-accent-foreground [&_svg]:size-6">

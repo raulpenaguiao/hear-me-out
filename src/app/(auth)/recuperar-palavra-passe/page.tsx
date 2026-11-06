@@ -25,7 +25,10 @@ export default function ResetPasswordPage() {
           Enviar link
         </SubmitButton>
       </ActionForm>
-      <Link href="/entrar" className="text-center text-sm text-muted-foreground underline-offset-4 hover:underline">
+      <Link
+        href="/entrar"
+        className="text-center text-sm text-muted-foreground underline-offset-4 hover:underline"
+      >
         Voltar a entrar
       </Link>
     </Card>

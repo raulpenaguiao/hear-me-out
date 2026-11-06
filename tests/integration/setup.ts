@@ -25,7 +25,11 @@ const clientOptions = {
   auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
 } as const;
 
-export const admin: SupabaseClient<Database> = createClient<Database>(SUPABASE_URL, SERVICE_KEY, clientOptions);
+export const admin: SupabaseClient<Database> = createClient<Database>(
+  SUPABASE_URL,
+  SERVICE_KEY,
+  clientOptions,
+);
 
 export function anonClient(): SupabaseClient<Database> {
   return createClient<Database>(SUPABASE_URL, ANON_KEY, clientOptions);

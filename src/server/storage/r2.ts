@@ -53,8 +53,7 @@ export class R2Storage implements ObjectStorage {
   private readonly bucket: string;
 
   constructor(config: R2Config) {
-    const endpoint =
-      config.endpoint ?? `https://${config.accountId}.r2.cloudflarestorage.com`;
+    const endpoint = config.endpoint ?? `https://${config.accountId}.r2.cloudflarestorage.com`;
     this.bucket = config.bucket;
     this.client = new S3Client({
       region: "auto",

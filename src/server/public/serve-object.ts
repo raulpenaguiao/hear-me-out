@@ -77,8 +77,7 @@ export async function serveObject(request: Request, opts: ServeObjectOptions): P
 
   // If-Range: only honour the Range header when the validator still matches.
   const ifRange = request.headers.get("if-range");
-  const rangeHeader =
-    ifRange && ifRange.trim() !== opts.etag ? null : request.headers.get("range");
+  const rangeHeader = ifRange && ifRange.trim() !== opts.etag ? null : request.headers.get("range");
   const parsed = parseRangeHeader(rangeHeader, opts.size);
 
   if (parsed.type === "unsatisfiable") {

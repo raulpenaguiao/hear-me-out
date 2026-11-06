@@ -50,7 +50,11 @@ export function ChannelFields({
           placeholder="Ex.: Peripécias"
         />
       </Field>
-      <Field label="Descrição" htmlFor="description" hint="Aparece na página do canal e nas apps de podcasts.">
+      <Field
+        label="Descrição"
+        htmlFor="description"
+        hint="Aparece na página do canal e nas apps de podcasts."
+      >
         <Textarea
           id="description"
           name="description"
@@ -81,7 +85,9 @@ export function ChannelFields({
         />
         <span>
           Conteúdo explícito
-          <span className="block text-xs text-muted-foreground">Marca o feed como explícito nas apps de podcasts.</span>
+          <span className="block text-xs text-muted-foreground">
+            Marca o feed como explícito nas apps de podcasts.
+          </span>
         </span>
       </label>
       {showPublished ? (

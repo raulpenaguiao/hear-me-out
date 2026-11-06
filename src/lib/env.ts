@@ -8,12 +8,9 @@ import { z } from "zod";
  * components: it reads secrets.
  */
 
-const booleanish = z
-  .enum(["true", "false", "1", "0"])
-  .transform((v) => v === "true" || v === "1");
+const booleanish = z.enum(["true", "false", "1", "0"]).transform((v) => v === "true" || v === "1");
 
-const positiveNumber = (fallback: number) =>
-  z.coerce.number().positive().default(fallback);
+const positiveNumber = (fallback: number) => z.coerce.number().positive().default(fallback);
 
 const base64Key32 = z
   .string()
@@ -59,12 +56,7 @@ const serverSchema = z
   })
   .superRefine((env, ctx) => {
     if (env.STORAGE_DRIVER === "r2") {
-      for (const key of [
-        "R2_ACCOUNT_ID",
-        "R2_ACCESS_KEY_ID",
-        "R2_SECRET_ACCESS_KEY",
-        "R2_BUCKET",
-      ] as const) {
+      for (const key of ["R2_ACCOUNT_ID", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_BUCKET"] as const) {
         if (!env[key] && !(key === "R2_ACCOUNT_ID" && env.R2_ENDPOINT)) {
           ctx.addIssue({
             code: "custom",
@@ -91,9 +83,7 @@ export function getEnv(): ServerEnv {
   if (cached) return cached;
   const parsed = serverSchema.safeParse(process.env);
   if (!parsed.success) {
-    const details = parsed.error.issues
-      .map((i) => `  - ${i.path.join(".")}: ${i.message}`)
-      .join("\n");
+    const details = parsed.error.issues.map((i) => `  - ${i.path.join(".")}: ${i.message}`).join("\n");
     // Only variable names and validation messages are printed, never values.
     throw new Error(`Invalid server environment configuration:\n${details}`);
   }
@@ -112,8 +102,7 @@ export function appUrl(): string {
     process.env.VERCEL_ENV === "production"
       ? process.env.VERCEL_PROJECT_PRODUCTION_URL
       : (process.env.VERCEL_BRANCH_URL ?? process.env.VERCEL_URL);
-  const url =
-    env.NEXT_PUBLIC_APP_URL ?? (vercelUrl ? `https://${vercelUrl}` : "http://localhost:3000");
+  const url = env.NEXT_PUBLIC_APP_URL ?? (vercelUrl ? `https://${vercelUrl}` : "http://localhost:3000");
   return url.replace(/\/+$/, "");
 }
 

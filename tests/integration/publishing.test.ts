@@ -209,7 +209,9 @@ describe("episode publishing and RSS", () => {
 
   it("rejects episode creation in someone else's channel", async () => {
     const { id: channelId } = await newChannel();
-    await expect(createEpisode(bobCtx, { channelId, title: "intruso", description: "" })).rejects.toMatchObject({
+    await expect(
+      createEpisode(bobCtx, { channelId, title: "intruso", description: "" }),
+    ).rejects.toMatchObject({
       code: "not_found",
     });
   });
@@ -234,7 +236,9 @@ describe("token rotation", () => {
     expect((await feedItems(oldRss)).status).toBe(404);
     expect((await feedItems(tokenFrom(after.rssUrl))).items).toHaveLength(1);
     expect((await handleAudioRequest(new Request("https://x"), guid, oldRss, pub)).status).toBe(404);
-    expect((await handleAudioRequest(new Request("https://x"), guid, tokenFrom(after.rssUrl), pub)).status).toBe(200);
+    expect(
+      (await handleAudioRequest(new Request("https://x"), guid, tokenFrom(after.rssUrl), pub)).status,
+    ).toBe(200);
 
     const both = await rotateChannelTokens(ctx, channelId, "both");
     expect(await loadPublicChannelView(oldWeb, pub)).toBeNull();
@@ -260,21 +264,41 @@ describe("upload validation", () => {
 
   it("rejects unsupported types and oversized files before issuing a URL", async () => {
     await expect(
-      createUpload(ctx, { kind: "audio", episodeId, fileName: "x.exe", contentType: "application/x-msdownload", size: 10 }),
+      createUpload(ctx, {
+        kind: "audio",
+        episodeId,
+        fileName: "x.exe",
+        contentType: "application/x-msdownload",
+        size: 10,
+      }),
     ).rejects.toMatchObject({ code: "invalid_input" });
     await expect(
-      createUpload(ctx, { kind: "audio", episodeId, fileName: "x.mp3", contentType: "audio/mpeg", size: 10 * 1024 * 1024 }),
+      createUpload(ctx, {
+        kind: "audio",
+        episodeId,
+        fileName: "x.mp3",
+        contentType: "audio/mpeg",
+        size: 10 * 1024 * 1024,
+      }),
     ).rejects.toMatchObject({ code: "invalid_input" });
   });
 
   it("rejects uploads to other users' episodes", async () => {
     await expect(
-      createUpload(bobCtx, { kind: "audio", episodeId, fileName: "x.mp3", contentType: "audio/mpeg", size: 10 }),
+      createUpload(bobCtx, {
+        kind: "audio",
+        episodeId,
+        fileName: "x.mp3",
+        contentType: "audio/mpeg",
+        size: 10,
+      }),
     ).rejects.toMatchObject({ code: "not_found" });
   });
 
   it("rejects content that does not match the declared type", async () => {
-    const html = new TextEncoder().encode("<!DOCTYPE html><html><body>not audio</body></html>".padEnd(200, " "));
+    const html = new TextEncoder().encode(
+      "<!DOCTYPE html><html><body>not audio</body></html>".padEnd(200, " "),
+    );
     await expect(
       uploadAudio(ctx, episodeId, html, { fileName: "x.mp3", contentType: "audio/mpeg" }),
     ).rejects.toMatchObject({ code: "upload_invalid" });
@@ -286,9 +310,9 @@ describe("upload validation", () => {
 
   it("rejects objects whose size differs from the declared size", async () => {
     const wav = makeWav(0.5);
-    await expect(
-      uploadAudio(ctx, episodeId, wav, { storedData: makeWav(0.6) }),
-    ).rejects.toMatchObject({ code: "upload_invalid" });
+    await expect(uploadAudio(ctx, episodeId, wav, { storedData: makeWav(0.6) })).rejects.toMatchObject({
+      code: "upload_invalid",
+    });
   });
 
   it("rejects completion of a missing object and double completion", async () => {
@@ -303,10 +327,18 @@ describe("upload validation", () => {
       code: "upload_invalid",
     });
     const wav = makeWav(0.2);
-    const ok = await createUpload(ctx, { kind: "audio", episodeId, fileName: "x.wav", contentType: "audio/wav", size: wav.byteLength });
+    const ok = await createUpload(ctx, {
+      kind: "audio",
+      episodeId,
+      fileName: "x.wav",
+      contentType: "audio/wav",
+      size: wav.byteLength,
+    });
     storage.put(ok.url.replace("memory://upload/", ""), wav);
     await completeUpload(ctx, ok.uploadId, { durationSeconds: 1 });
-    await expect(completeUpload(ctx, ok.uploadId, { durationSeconds: 1 })).rejects.toMatchObject({ code: "not_found" });
+    await expect(completeUpload(ctx, ok.uploadId, { durationSeconds: 1 })).rejects.toMatchObject({
+      code: "not_found",
+    });
     // Another user cannot complete someone else's upload.
     await expect(completeUpload(bobCtx, created.uploadId, { durationSeconds: 1 })).rejects.toMatchObject({
       code: "not_found",
@@ -314,18 +346,20 @@ describe("upload validation", () => {
   });
 
   it("rejects audio longer than the configured limit", async () => {
-    await expect(uploadAudio(ctx, episodeId, makeWav(0.2), { durationSeconds: 10_000 })).rejects.toMatchObject({
+    await expect(
+      uploadAudio(ctx, episodeId, makeWav(0.2), { durationSeconds: 10_000 }),
+    ).rejects.toMatchObject({
       code: "upload_invalid",
     });
   });
 
   it("replaces previous audio and deletes the old object", async () => {
     await uploadAudio(ctx, episodeId, makeWav(0.2));
-    const first = (await admin.from("episodes").select("audio_storage_key").eq("id", episodeId).single()).data!
-      .audio_storage_key!;
+    const first = (await admin.from("episodes").select("audio_storage_key").eq("id", episodeId).single())
+      .data!.audio_storage_key!;
     await uploadAudio(ctx, episodeId, makeWav(0.3));
-    const second = (await admin.from("episodes").select("audio_storage_key").eq("id", episodeId).single()).data!
-      .audio_storage_key!;
+    const second = (await admin.from("episodes").select("audio_storage_key").eq("id", episodeId).single())
+      .data!.audio_storage_key!;
     expect(second).not.toBe(first);
     expect(storage.objects.has(first)).toBe(false);
     expect(storage.objects.has(second)).toBe(true);

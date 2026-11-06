@@ -36,7 +36,10 @@ export default async function SignInPage({ searchParams }: PageProps<"/entrar">)
         </SubmitButton>
       </ActionForm>
       <div className="flex flex-col gap-2 text-center text-sm">
-        <Link href="/recuperar-palavra-passe" className="text-muted-foreground underline-offset-4 hover:underline">
+        <Link
+          href="/recuperar-palavra-passe"
+          className="text-muted-foreground underline-offset-4 hover:underline"
+        >
           Esqueci-me da palavra-passe
         </Link>
         <p className="text-muted-foreground">

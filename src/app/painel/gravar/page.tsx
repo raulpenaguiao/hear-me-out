@@ -45,9 +45,9 @@ export default async function RecordPage({ searchParams }: PageProps<"/painel/gr
         />
       </Card>
       <p className="mt-4 text-xs text-muted-foreground">
-        Dica: no iPhone e no Safari as gravações ficam em M4A, compatível com quase todas as apps de podcasts. Noutros
-        navegadores ficam em WebM/Opus, que toca no navegador e em várias apps (p. ex. AntennaPod), mas não na Apple
-        Podcasts. Para máxima compatibilidade podes carregar um MP3 ou M4A.
+        Dica: no iPhone e no Safari as gravações ficam em M4A, compatível com quase todas as apps de podcasts.
+        Noutros navegadores ficam em WebM/Opus, que toca no navegador e em várias apps (p. ex. AntennaPod),
+        mas não na Apple Podcasts. Para máxima compatibilidade podes carregar um MP3 ou M4A.
       </p>
     </div>
   );

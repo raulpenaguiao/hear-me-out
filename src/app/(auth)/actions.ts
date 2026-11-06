@@ -4,7 +4,13 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { appUrl, getEnv } from "@/lib/env";
 import type { FormState } from "@/lib/form-state";
-import { emailSchema, firstIssueMessage, safeRedirectPath, signInSchema, signUpSchema } from "@/lib/validation";
+import {
+  emailSchema,
+  firstIssueMessage,
+  safeRedirectPath,
+  signInSchema,
+  signUpSchema,
+} from "@/lib/validation";
 import { clientIp, createRateLimiter, RATE_LIMITS, type RateLimitRule } from "@/server/rate-limit";
 import { createAdminClient, createUserClient } from "@/server/supabase/clients";
 
@@ -72,8 +78,7 @@ export async function signUpAction(_prev: FormState, formData: FormData): Promis
   // With e-mail confirmation enabled there is no session yet.
   if (!data.session) {
     return {
-      success:
-        "Conta criada! Enviámos-te um e-mail de confirmação. Abre o link para começares a publicar.",
+      success: "Conta criada! Enviámos-te um e-mail de confirmação. Abre o link para começares a publicar.",
     };
   }
   redirect("/painel");
@@ -90,7 +95,8 @@ export async function requestPasswordResetAction(_prev: FormState, formData: For
   });
   // Same response whether or not the account exists (no user enumeration).
   return {
-    success: "Se existir uma conta com este e-mail, vais receber um link para definir uma nova palavra-passe.",
+    success:
+      "Se existir uma conta com este e-mail, vais receber um link para definir uma nova palavra-passe.",
   };
 }
 

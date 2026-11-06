@@ -289,7 +289,10 @@ describe("cover endpoint", () => {
   });
 
   it("serves the uploaded cover", async () => {
-    const { channel, webToken } = repo.addChannel({ coverImageKey: "covers/x/a.png", coverImageMimeType: "image/png" });
+    const { channel, webToken } = repo.addChannel({
+      coverImageKey: "covers/x/a.png",
+      coverImageMimeType: "image/png",
+    });
     storage.put("covers/x/a.png", new Uint8Array([1, 2, 3]), "image/png");
     const res = await handleCoverRequest(req("/cover"), webToken, ctx);
     expect(channel.coverImageKey).toBe("covers/x/a.png");

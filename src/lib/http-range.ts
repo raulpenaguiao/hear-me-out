@@ -11,9 +11,7 @@ export interface ByteRange {
 }
 
 export type RangeParseResult =
-  | { type: "none" }
-  | { type: "range"; range: ByteRange }
-  | { type: "unsatisfiable" };
+  { type: "none" } | { type: "range"; range: ByteRange } | { type: "unsatisfiable" };
 
 export function parseRangeHeader(header: string | null, size: number): RangeParseResult {
   if (!header) return { type: "none" };
@@ -21,7 +19,10 @@ export function parseRangeHeader(header: string | null, size: number): RangePars
   const match = /^bytes\s*=\s*(.+)$/i.exec(trimmed);
   if (!match) return { type: "none" }; // unknown unit: ignore the header
 
-  const specs = match[1]!.split(",").map((s) => s.trim()).filter(Boolean);
+  const specs = match[1]!
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
   if (specs.length !== 1) return { type: "none" };
   const spec = specs[0]!;
 

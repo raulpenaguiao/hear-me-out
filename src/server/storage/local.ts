@@ -91,11 +91,7 @@ export class LocalStorage implements ObjectStorage {
   }
 
   /** Writes an uploaded body to disk, streaming, with a hard size cap. */
-  async writeFromStream(
-    key: string,
-    body: ReadableStream<Uint8Array>,
-    maxBytes: number,
-  ): Promise<number> {
+  async writeFromStream(key: string, body: ReadableStream<Uint8Array>, maxBytes: number): Promise<number> {
     const target = this.filePath(key);
     await mkdir(path.dirname(target), { recursive: true });
     const temp = `${target}.uploading-${process.pid}-${Date.now()}`;

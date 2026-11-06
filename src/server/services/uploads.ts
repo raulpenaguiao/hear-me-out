@@ -143,7 +143,9 @@ export async function completeUpload(
 ): Promise<CompletedUpload> {
   const { data: upload, error } = await ctx.admin
     .from("uploads")
-    .select("id, kind, channel_id, episode_id, storage_key, declared_mime_type, declared_size_bytes, completed_at")
+    .select(
+      "id, kind, channel_id, episode_id, storage_key, declared_mime_type, declared_size_bytes, completed_at",
+    )
     .eq("id", uploadId)
     .eq("owner_id", ctx.userId)
     .maybeSingle();

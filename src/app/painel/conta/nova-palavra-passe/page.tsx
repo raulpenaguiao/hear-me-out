@@ -16,10 +16,24 @@ export default function NewPasswordPage() {
       <Card>
         <ActionForm action={updatePasswordAction}>
           <Field label="Nova palavra-passe" htmlFor="password" hint="Pelo menos 8 caracteres.">
-            <Input id="password" name="password" type="password" autoComplete="new-password" minLength={8} required />
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              autoComplete="new-password"
+              minLength={8}
+              required
+            />
           </Field>
           <Field label="Confirmar" htmlFor="confirm">
-            <Input id="confirm" name="confirm" type="password" autoComplete="new-password" minLength={8} required />
+            <Input
+              id="confirm"
+              name="confirm"
+              type="password"
+              autoComplete="new-password"
+              minLength={8}
+              required
+            />
           </Field>
           <SubmitButton size="lg" pendingLabel="A guardar…">
             Guardar palavra-passe

@@ -12,14 +12,17 @@ export default function HomePage() {
         </ButtonLink>
       </header>
 
-      <main id="conteudo" className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-16 px-4 pb-16 pt-8 sm:pt-16">
+      <main
+        id="conteudo"
+        className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-16 px-4 pb-16 pt-8 sm:pt-16"
+      >
         <section className="flex max-w-2xl flex-col gap-6">
           <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
             Grava as tuas histórias. Partilha-as só com quem quiseres.
           </h1>
           <p className="text-lg text-muted-foreground text-pretty">
-            O Ouve Isto é um pequeno podcast privado: gravas no telemóvel, dás um título e publicas. Quem tiver o
-            link ouve no navegador ou subscreve na sua app de podcasts — sem contas, sem complicações.
+            O Ouve Isto é um pequeno podcast privado: gravas no telemóvel, dás um título e publicas. Quem
+            tiver o link ouve no navegador ou subscreve na sua app de podcasts — sem contas, sem complicações.
           </p>
           <div className="flex flex-wrap gap-3">
             <ButtonLink href="/registar" size="lg">
@@ -61,9 +64,9 @@ export default function HomePage() {
         <section className="flex items-start gap-3 rounded-2xl bg-muted p-5 text-sm text-muted-foreground">
           <Headphones className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
           <p>
-            Privado, mas com bom senso: os links funcionam como uma chave. Qualquer pessoa que receba o link pode
-            ouvir e reencaminhá-lo. Se um link circular demais, podes gerar um novo a qualquer momento e o antigo
-            deixa de funcionar.
+            Privado, mas com bom senso: os links funcionam como uma chave. Qualquer pessoa que receba o link
+            pode ouvir e reencaminhá-lo. Se um link circular demais, podes gerar um novo a qualquer momento e
+            o antigo deixa de funcionar.
           </p>
         </section>
       </main>

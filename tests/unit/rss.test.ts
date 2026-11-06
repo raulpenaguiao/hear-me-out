@@ -49,7 +49,10 @@ const parser = new XMLParser({
 function parse(xml: string) {
   expect(XMLValidator.validate(xml)).toBe(true);
   return parser.parse(xml) as {
-    rss: { "@_version": string; channel: Record<string, unknown> & { item?: Array<Record<string, unknown>> } };
+    rss: {
+      "@_version": string;
+      channel: Record<string, unknown> & { item?: Array<Record<string, unknown>> };
+    };
   };
 }
 
@@ -104,8 +107,16 @@ describe("buildFeedXml", () => {
       buildFeedXml(
         channel,
         [
-          episode({ guid: "00000000-0000-4000-8000-000000000001", title: "old", publishedAt: new Date("2026-01-01") }),
-          episode({ guid: "00000000-0000-4000-8000-000000000002", title: "new", publishedAt: new Date("2026-03-01") }),
+          episode({
+            guid: "00000000-0000-4000-8000-000000000001",
+            title: "old",
+            publishedAt: new Date("2026-01-01"),
+          }),
+          episode({
+            guid: "00000000-0000-4000-8000-000000000002",
+            title: "new",
+            publishedAt: new Date("2026-03-01"),
+          }),
         ],
         links,
       ),
@@ -132,7 +143,11 @@ describe("buildFeedXml", () => {
 
   it("falls back to sensible defaults", () => {
     const doc = parse(
-      buildFeedXml({ ...channel, authorName: null, description: "", explicit: true }, [episode({ durationSeconds: null, description: "" })], links),
+      buildFeedXml(
+        { ...channel, authorName: null, description: "", explicit: true },
+        [episode({ durationSeconds: null, description: "" })],
+        links,
+      ),
     );
     expect(doc.rss.channel["itunes:author"]).toBe(channel.title);
     expect(doc.rss.channel.description).toBe(channel.title);
